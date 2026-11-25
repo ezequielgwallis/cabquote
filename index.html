@@ -1621,7 +1621,7 @@ function collect(){
  var imgs=[].map.call(document.querySelectorAll('#skrg img'),function(im){return im.src});
  return{shop:window.SHOPNAME||'',num:cur.id&&cur.num?String(cur.num):'',date:new Date().toLocaleDateString(window.I18N&&I18N.get&&I18N.get()==='en'?'en-US':'es-US'),
   nm:$$('cn').value||c.name||'',ph:$$('cp').value,em:$$('ce').value,ad:$$('ca').value,dd:$$('dd').value,pa:($$('pa')&&$$('pa').value||'').trim(),project:$$('pn').value||'Sin nombre',
-  opts:opts,rows:rows,lf:lf,noP:noP,imgs:imgs,nest:(function(){try{if($('incn')&&!$('incn').checked)return null;if(window.ROLE==='customer'||(typeof ROLE!=='undefined'&&ROLE==='customer'))return null;if(isD()){var DC=T.DC;if(!DC||!DC.d1||DC.n==null||!DC.bins||!DC.bins.length)return null;return{N:{n34:null,n14:null,nd1:DC.n,nd2:null,bd1:DC.bins,Sd1:Math.min(DC.z.w||48,DC.z.h||96),Ld1:Math.max(DC.z.w||48,DC.z.h||96),gd1:DC.g,c:cncOf(P),dm1:$('o_dmat').value},fname:'',dn1:$('o_dmat').value+(cn('c_door')?' '+cn('c_door'):''),dn2:''}}var N=typeof nestPlan==='function'&&nestPlan();if(!N||(N.n34==null&&N.n14==null&&N.nd1==null&&N.nd2==null))return null;var f=typeof sheetOf==='function'?sheetOf($$('fin').value,CV.c_mat):{name:'3/4'};var dn1=(N.dm1==='Other'?(CV.c_dmato||'Other'):N.dm1)+(cn('c_door')?' '+cn('c_door'):''),dn2=(N.dm2==='Other'?(CV.c_dmat2o||'Other'):N.dm2)+(cn('c_door2')?' '+cn('c_door2'):'');return{N:N,fname:f.name,dn1:dn1,dn2:dn2}}catch(e){return null}})(),
+  opts:opts,rows:rows,lf:lf,noP:noP,imgs:imgs,nest:(function(){try{if(!isC()&&$('incn')&&!$('incn').checked)return null;if(isD()){var DC=T.DC||(isC()?doorCalc(0):null);if(!DC||!DC.d1||DC.n==null||!DC.bins||!DC.bins.length)return null;return{N:{n34:null,n14:null,nd1:DC.n,nd2:null,bd1:DC.bins,Sd1:Math.min(DC.z.w||48,DC.z.h||96),Ld1:Math.max(DC.z.w||48,DC.z.h||96),gd1:DC.g,c:cncOf(P),dm1:$('o_dmat').value},fname:'',dn1:$('o_dmat').value+(cn('c_door')?' '+cn('c_door'):''),dn2:''}}var N=typeof nestPlan==='function'&&nestPlan();if(!N||(N.n34==null&&N.n14==null&&N.nd1==null&&N.nd2==null))return null;var f=typeof sheetOf==='function'?sheetOf($$('fin').value,CV.c_mat):{name:'3/4'};var dn1=(N.dm1==='Other'?(CV.c_dmato||'Other'):N.dm1)+(cn('c_door')?' '+cn('c_door'):''),dn2=(N.dm2==='Other'?(CV.c_dmat2o||'Other'):N.dm2)+(cn('c_door2')?' '+cn('c_door2'):'');return{N:N,fname:f.name,dn1:dn1,dn2:dn2}}catch(e){return null}})(),
   tot:noP?null:(function(){var tt=T.tot,tp=parseFloat($$('tax').value)||0,ts=T.sub,tx=T.tax;if(isC()&&isD()&&typeof SRV==='number'&&SRV>0){tt=SRV;ts=tt/(1+tp/100);tx=tt-ts}return{sub:money(ts),tax:money(tx),taxp:tp,total:money(tt),dep:money(tt*p.dep/100),depp:p.dep}})()}}
 window.collectPrint=collect;
 window.buildPrint=function(){
@@ -1777,11 +1777,13 @@ function pdfName(){var d=collect();return 'Cotizacion'+(d.num?'-'+d.num:'')+'-'+
 async function pdfFile(){var d=collect(),b=await makePdf(d);return new File([b],pdfName(),{type:'application/pdf'})}
 function canShareFile(){try{return !!(navigator.canShare&&navigator.share&&navigator.canShare({files:[new File(['x'],'a.pdf',{type:'application/pdf'})]}))}catch(e){return false}}
 function download(f){var u=URL.createObjectURL(f),a=document.createElement('a');a.href=u;a.download=f.name;document.body.appendChild(a);a.click();setTimeout(function(){a.remove();URL.revokeObjectURL(u)},4000)}
+/* Reenvíos sin límite: si el cliente ya envió la cotización al taller, ya no se guarda ni se vuelve a enviar; solo se abre otra vez el correo, WhatsApp o compartir. */
+function custLocked(){return !!(cur&&cur.id&&(cur._sub||(cur.status&&cur.status!=='tentative'&&cur.status!=='draft')))}
 window.sharePdf=async function(){
  if(!cur)return;var sc=(typeof SHOPC!=='undefined'&&SHOPC)||{};
  if(isC()){if(!sc.email){msg('El taller aún no registró su email. Avísale al taller.');return}
-  var id=await save();if(!id)return;
-  if(cur.status==='tentative'||!cur.status||cur.status==='draft'){var r0=await SB.rpc('submit_quote',{p_quote:id});if(r0.error&&!/no encontrada/i.test(r0.error.message||'')){msg(r0.error.message);return}}
+  var lk0=custLocked(),id=lk0?cur.id:await save();if(!id)return;
+  if(!lk0&&(cur.status==='tentative'||!cur.status||cur.status==='draft')){var r0=await SB.rpc('submit_quote',{p_quote:id});if(r0.error&&!/no encontrada/i.test(r0.error.message||'')){msg(r0.error.message);return}cur._sub=true}
   try{await loadQuotes()}catch(e){}}
  var m=sendMsg();
  if(m.miss.length){msg('Antes de enviar completa: '+m.miss.join(', ')+'.');return}
@@ -1796,8 +1798,8 @@ async function custGo(ch){
  var sc=(typeof SHOPC!=='undefined'&&SHOPC)||{},ph=String(sc.phone||'').replace(/[^\d]/g,'');
  if(!sc.email){msg('El taller aún no registró su email. Avísale al taller.');return}
  if(ch==='wa'&&!ph){msg('El taller no registró WhatsApp. Usa Email.');return}
- var id=await save();if(!id)return;
- if(cur.status==='tentative'||!cur.status||cur.status==='draft'){var r=await SB.rpc('submit_quote',{p_quote:id});if(r.error&&!/no encontrada/i.test(r.error.message||'')){msg(r.error.message);return}}
+ var lk1=custLocked(),id=lk1?cur.id:await save();if(!id)return;
+ if(!lk1&&(cur.status==='tentative'||!cur.status||cur.status==='draft')){var r=await SB.rpc('submit_quote',{p_quote:id});if(r.error&&!/no encontrada/i.test(r.error.message||'')){msg(r.error.message);return}cur._sub=true}
  var m=sendMsg(),nn=cur.num,pj=cur.project||$$('pn').value;
  try{await loadQuotes()}catch(e){}
  if(typeof show==='function')show('list');
@@ -1929,5 +1931,5 @@ function safe(){try{init()}catch(e){}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',safe);else safe();
 })();
 </script>
-<div style="position:fixed;right:8px;bottom:3px;font-size:10px;opacity:.45;pointer-events:none;z-index:1">v 25-Nov 16:59</div></body>
+<div style="position:fixed;right:8px;bottom:3px;font-size:10px;opacity:.45;pointer-events:none;z-index:1">v 25-Nov 17:11</div></body>
 </html>
