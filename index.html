@@ -305,7 +305,7 @@ body.sk-open{overflow:hidden}
     <p class="hint pnote" hidden>El taller revisará tu solicitud y te enviará el precio.</p>
     <div class="l big pv"><span>Total</span><span id="rtot"></span></div>
     <div class="l pv"><span>Depósito (<span id="dp"></span>%)</span><b id="rd"></b></div>
-    <div class="actions"><button class="pri" id="save">Guardar cotización</button><button class="pri" id="send" hidden>Enviar al taller</button><button id="dup">Duplicar</button><button id="cv">Vista cliente</button><button id="prn">Imprimir o PDF</button><button id="snp" type="button" class="pri" hidden>Enviar PDF</button><button id="sne" type="button">Enviar por Email</button><button id="snw" type="button">Enviar por WhatsApp</button><button id="exm" type="button">Exportar a Mozaik</button><button id="del">Eliminar</button></div>
+    <div class="actions"><button class="pri" id="save">Guardar cotización</button><button class="pri" id="send" hidden>Enviar al taller</button><button id="dup">Duplicar</button><button id="cv">Vista cliente</button><button id="prn">Imprimir o PDF</button><button id="snp" type="button" class="pri" hidden>Enviar PDF</button><button id="sne" type="button">Enviar por Email</button><button id="snw" type="button">Enviar por WhatsApp</button><button id="exm" type="button">Exportar a Mozaik</button><button id="del">Eliminar</button></div><label class="hint" id="incw" style="display:flex;gap:8px;align-items:center;margin-top:8px"><input type="checkbox" id="incn" checked> Incluir el acomodo en placas (corte CNC) en el PDF</label>
   </div></div>
   <div class="actions" id="nav"><button id="bk">Atrás</button><button class="pri" id="nx">Siguiente</button></div>
 </div>
@@ -639,7 +639,7 @@ $('upd').onclick=function(){cur.snap=null;$('snapn').hidden=true;var f=$('fin').
 $('save').onclick=save;
 $('dup').onclick=function(){var c=cl(cur);delete c.id;delete c.num;delete c.createdAt;c.status='draft';c.snap=null;c.client={name:$('cn').value,phone:$('cp').value,email:$('ce').value,addr:$('ca').value};c.delivery='';c.opts=collectOpts();c.project=$('pn').value;c.fin=$('fin').value;c.hw=$('hw').value;c.margin=$('mar').value;c.tax=$('tax').value;load(c);msg('Copia lista. Guárdala para crearla.')};
 $('cv').onclick=function(){var c=document.body.classList.toggle('cli');this.textContent=c?'Vista interna':'Vista cliente'};
-$('prn').onclick=function(){if(window.buildPrint)buildPrint();window.print()};
+try{$('incn').checked=localStorage.getItem('cq_incn')!=='0'}catch(e){}$('incn').onchange=function(){try{localStorage.setItem('cq_incn',this.checked?'1':'0')}catch(e){}};$('prn').onclick=function(){if(window.buildPrint)buildPrint();window.print()};
 $('del').onclick=function(){if(!delArmed){delArmed=true;this.textContent='¿Seguro? Toca otra vez';return}
 delQuote(cur.id).then(function(){msg('Cotización eliminada');loadQuotes();show('list')}).catch(function(){msg('No se pudo eliminar.')})};
 $('q').oninput=drawList;
@@ -1422,7 +1422,7 @@ async function start(info){
  if(cust){
   ['rc','rg','rs','rt','rd'].forEach(function(i){var l=$(i).closest('.l');if(l)l.hidden=true});
   $('mar').closest('.sec').hidden=true;$('mat').closest('.sec').hidden=true;$('lfsec').remove();$('miss').hidden=true;
-  ['dup','cv','del','prn','exm'].forEach(function(i){$(i).hidden=true});
+  ['dup','cv','del','prn','exm','incw'].forEach(function(i){$(i).hidden=true});
   $('st').parentNode.hidden=true;$('snapn').hidden=true;$('w_asm').hidden=true;$('w_asmo').hidden=true;$('cn').readOnly=true;$('cp').readOnly=true;$('ce').readOnly=true;$('ca').readOnly=true;$('send').hidden=true;
  }
  drawPrices();
@@ -1619,7 +1619,7 @@ function collect(){
  var imgs=[].map.call(document.querySelectorAll('#skrg img'),function(im){return im.src});
  return{shop:window.SHOPNAME||'',num:cur.id&&cur.num?String(cur.num):'',date:new Date().toLocaleDateString(window.I18N&&I18N.get&&I18N.get()==='en'?'en-US':'es-US'),
   nm:$$('cn').value||c.name||'',ph:$$('cp').value,em:$$('ce').value,ad:$$('ca').value,dd:$$('dd').value,pa:($$('pa')&&$$('pa').value||'').trim(),project:$$('pn').value||'Sin nombre',
-  opts:opts,rows:rows,lf:lf,noP:noP,imgs:imgs,nest:(function(){try{if(window.ROLE==='customer'||(typeof ROLE!=='undefined'&&ROLE==='customer'))return null;if(isD()){var DC=T.DC;if(!DC||!DC.d1||DC.n==null||!DC.bins||!DC.bins.length)return null;return{N:{n34:null,n14:null,nd1:DC.n,nd2:null,bd1:DC.bins,Sd1:Math.min(DC.z.w||48,DC.z.h||96),Ld1:Math.max(DC.z.w||48,DC.z.h||96),gd1:DC.g,c:cncOf(P),dm1:$('o_dmat').value},fname:'',dn1:$('o_dmat').value+(cn('c_door')?' '+cn('c_door'):''),dn2:''}}var N=typeof nestPlan==='function'&&nestPlan();if(!N||(N.n34==null&&N.n14==null&&N.nd1==null&&N.nd2==null))return null;var f=typeof sheetOf==='function'?sheetOf($$('fin').value,CV.c_mat):{name:'3/4'};var dn1=(N.dm1==='Other'?(CV.c_dmato||'Other'):N.dm1)+(cn('c_door')?' '+cn('c_door'):''),dn2=(N.dm2==='Other'?(CV.c_dmat2o||'Other'):N.dm2)+(cn('c_door2')?' '+cn('c_door2'):'');return{N:N,fname:f.name,dn1:dn1,dn2:dn2}}catch(e){return null}})(),
+  opts:opts,rows:rows,lf:lf,noP:noP,imgs:imgs,nest:(function(){try{if($('incn')&&!$('incn').checked)return null;if(window.ROLE==='customer'||(typeof ROLE!=='undefined'&&ROLE==='customer'))return null;if(isD()){var DC=T.DC;if(!DC||!DC.d1||DC.n==null||!DC.bins||!DC.bins.length)return null;return{N:{n34:null,n14:null,nd1:DC.n,nd2:null,bd1:DC.bins,Sd1:Math.min(DC.z.w||48,DC.z.h||96),Ld1:Math.max(DC.z.w||48,DC.z.h||96),gd1:DC.g,c:cncOf(P),dm1:$('o_dmat').value},fname:'',dn1:$('o_dmat').value+(cn('c_door')?' '+cn('c_door'):''),dn2:''}}var N=typeof nestPlan==='function'&&nestPlan();if(!N||(N.n34==null&&N.n14==null&&N.nd1==null&&N.nd2==null))return null;var f=typeof sheetOf==='function'?sheetOf($$('fin').value,CV.c_mat):{name:'3/4'};var dn1=(N.dm1==='Other'?(CV.c_dmato||'Other'):N.dm1)+(cn('c_door')?' '+cn('c_door'):''),dn2=(N.dm2==='Other'?(CV.c_dmat2o||'Other'):N.dm2)+(cn('c_door2')?' '+cn('c_door2'):'');return{N:N,fname:f.name,dn1:dn1,dn2:dn2}}catch(e){return null}})(),
   tot:noP?null:(function(){var tt=T.tot,tp=parseFloat($$('tax').value)||0,ts=T.sub,tx=T.tax;if(isC()&&isD()&&typeof SRV==='number'&&SRV>0){tt=SRV;ts=tt/(1+tp/100);tx=tt-ts}return{sub:money(ts),tax:money(tx),taxp:tp,total:money(tt),dep:money(tt*p.dep/100),depp:p.dep}})()}}
 window.collectPrint=collect;
 window.buildPrint=function(){
@@ -1927,5 +1927,5 @@ function safe(){try{init()}catch(e){}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',safe);else safe();
 })();
 </script>
-<div style="position:fixed;right:8px;bottom:3px;font-size:10px;opacity:.45;pointer-events:none;z-index:1">v 25-Nov 16:31</div></body>
+<div style="position:fixed;right:8px;bottom:3px;font-size:10px;opacity:.45;pointer-events:none;z-index:1">v 25-Nov 16:43</div></body>
 </html>
