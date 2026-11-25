@@ -756,6 +756,8 @@ function osum(){var o=collectOpts(),rows=[],sp=colorSpec(),G={dmat:'rc_dmat',fin
 OPT.forEach(function(x){var k=x[0];if(isD()&&(!/^(door|frame|dcustom|dmat|hw|pto|notes)$/.test(k)||(k==='hw'&&!(cur.doors||[]).some(function(d){return d.hg&&d.k!=='F'}))))return;var v=x[2]==='S'?($(k).value&&$(k).selectedOptions[0]?$(k).selectedOptions[0].text:''):o[k];add(x[1].replace(', afecta el precio',''),v);
 if(G[k])sp.forEach(function(f){if(!f.dep&&(TG[f.k]||'rc_drawer')===G[k])add(f.l,CV[f.k]==='Other'?'Other: '+(CV[f.k+'_o']||''):CV[f.k])})});
 if(!isD())add('Special Hardware',(o.sh||[]).map(function(n){var m=SHS[n];if(!m)return n;var d=(o.shsub||{})[m.id]||[];d=d.map(function(x){return (m.sub&&m.sub[x]&&(o.shsub||{})[m.sub[x].id])?x+' ('+o.shsub[m.sub[x].id].map(function(y){return y+'"'}).join(', ')+')':x==='Custom'?'Custom'+(o.shsubc?' '+o.shsubc+'"':''):(m.n?x+'"':x)});return n+(d.length?' ('+d.join(', ')+')':'')}).join(', '));if(!isD())add('Special Hardware: notas',o.shnotes);var gl=golaCalc();if(!isD()&&gl.on&&gl.gp)add('Perfil Gola: unidades de 8 pies','L: '+gl.uL+' ('+gl.L.toFixed(1)+' pies) · C: '+gl.uC+' ('+gl.C.toFixed(1)+' pies) · Brackets: '+gl.nb);add('Notas',o.notes);
+if(isD()){var sd=0,sf=0,qd=0,qf=0;(cur.doors||[]).forEach(function(x){var w=dIn(x.w),hh=dIn(x.h),q=Math.max(1,parseInt(x.q,10)||1);if(!(w>0&&hh>0))return;if(x.k==='F'){sf+=w*hh*q/144;qf+=q}else{sd+=w*hh*q/144;qd+=q}});
+if(qd+qf){if(qd)add('Puertas',qd+' pzas · '+sd.toFixed(2)+' pie²');if(qf)add('Frentes de gaveta',qf+' pzas · '+sf.toFixed(2)+' pie²');add('Total pie² de puertas',(sd+sf).toFixed(2)+' pie²')}}
 if(cur.mode==='lf')add('Cotización','Estimado por pie lineal: '+LFG.filter(function(g){return parseFloat((cur.lf||{})[g])>0}).map(function(g){return g+' '+cur.lf[g]+' pies'}).join(' · '));
 $('osum').innerHTML='<p><b>'+esc($('pn').value||'Sin nombre de proyecto')+'</b> · '+esc($('cn').value||'Sin cliente')+($('dd').value?' · Entrega: '+esc($('dd').value):'')+'</p><div class="tot">'+rows.join('')+'</div>'}
 function setStep(n){stp=n;document.querySelectorAll('.step').forEach(function(s){s.classList.toggle('h',+s.dataset.s!==n)});
@@ -1927,5 +1929,5 @@ function safe(){try{init()}catch(e){}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',safe);else safe();
 })();
 </script>
-<div style="position:fixed;right:8px;bottom:3px;font-size:10px;opacity:.45;pointer-events:none;z-index:1">v 25-Nov 16:43</div></body>
+<div style="position:fixed;right:8px;bottom:3px;font-size:10px;opacity:.45;pointer-events:none;z-index:1">v 25-Nov 16:55</div></body>
 </html>
