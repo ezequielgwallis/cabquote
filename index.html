@@ -276,7 +276,7 @@ body.sk-open{overflow:hidden}
   <div class="step h" data-s="6"><div class="sec"><h2>¿Qué vas a cotizar?</h2><div class="pick" id="kind">
     <button data-kind="proj"><b>Proyecto</b><span>Cocina o gabinetes: gabinetes, gavetas, herrajes y todo lo demás.</span></button>
     <button data-kind="doors"><b>Puertas</b><span>Solo puertas: estilo, color, medidas y bisagras de cada una.</span></button></div></div></div>
-  <div class="step h" data-s="7"><div class="sec"><h2>Puertas</h2><div id="dlist"></div><button id="dadd" type="button">Agregar puerta</button>
+  <div class="step h" data-s="7"><div class="sec"><h2>Puertas</h2><p class="hint" id="dgh" hidden></p><div id="dlist"></div><button id="dadd" type="button">Agregar puerta</button>
     <p class="hint">Medidas en pulgadas, con fracción si hace falta: 17 3/4. Si el color tiene Grain, elige primero el sentido de la veta: Vertical (la veta corre a lo largo del alto, la puerta no se gira) u Horizontal (corre a lo largo del ancho, la pieza se gira en la placa). La posición de cada bisagra se mide hasta el centro de la bisagra: la bisagra 2 desde el borde de abajo y las demás desde el borde de arriba.</p>
     <div class="tot" id="dres" style="margin-top:10px"></div></div></div>
   <div class="step h" data-s="4"><div class="sec"><h2>¿Cómo quieres cotizar?</h2><div class="pick" id="pick">
@@ -505,7 +505,7 @@ function doorCalc(mg){
 function doorN(){var r=doorCalc(.3);return r.n}
 function dPosOk(x){var n=parseInt(x.hn,10)||0,hh=dIn(x.h);if(n<1)return false;for(var k=0;k<n;k++){var v=dIn((x.hp||[])[k]);if(!(v>0&&v<hh))return false}return true}
 function drawDoors(){var el=$('dlist');if(!el||!cur)return;if(!cur.doors)cur.doors=[];
- var NM=dNames(cur.doors),gr=dGr();el.innerHTML=cur.doors.map(function(x,i){var n=parseInt(x.hn,10)||0,hp='',fr=x.k==='F';
+ var NM=dNames(cur.doors),gr=dGr();var gh=$('dgh');if(gh){var dmv=$('o_dmat').value,cv=CV.c_door,cust=typeof ROLE!=='undefined'&&ROLE==='customer';gh.hidden=!(dmv&&dmv!=='Other'&&cv&&!gr&&!cust&&cur.doors.length);gh.textContent='El color «'+(cv||'')+'» ('+dmv+') no tiene Grain marcado, por eso no se puede elegir la veta y las piezas se giran libremente. Para elegir la veta, marca Grain en ese color en Precios (Marca '+dmv+').'}el.innerHTML=cur.doors.map(function(x,i){var n=parseInt(x.hn,10)||0,hp='',fr=x.k==='F';
   if(x.hg&&!fr){for(var k=0;k<n;k++)hp+='<div><label>Bisagra '+(k+1)+' · desde '+(k===1?'abajo':'arriba')+' (")</label><input data-d="'+i+'" data-f="hp" data-k="'+k+'" value="'+esc((x.hp||[])[k]||'')+'" inputmode="decimal"></div>'}
   return '<div class="dr"><div class="dh"><b>'+NM[i]+'</b><span><button type="button" data-dc="'+i+'">Duplicar</button> <button type="button" class="x" data-dx="'+i+'" aria-label="Quitar puerta">✕</button></span></div>'
   +'<div class="dg"><div><label>Tipo</label><select data-d="'+i+'" data-f="k"><option value="P"'+(fr?'':' selected')+'>Puerta</option><option value="F"'+(fr?' selected':'')+'>Frente de gaveta</option></select></div>'+(gr?'<div><label>Veta (Grain)</label><select data-d="'+i+'" data-f="v"><option value="V"'+(x.v==='H'?'':' selected')+'>Vertical</option><option value="H"'+(x.v==='H'?' selected':'')+'>Horizontal</option></select></div>':'')+'<div><label>Ancho (")</label><input data-d="'+i+'" data-f="w" value="'+esc(x.w)+'" inputmode="decimal"></div><div><label>Alto (")</label><input data-d="'+i+'" data-f="h" value="'+esc(x.h)+'" inputmode="decimal"></div><div><label>Cant.</label><input data-d="'+i+'" data-f="q" type="number" min="1" value="'+esc(x.q)+'"></div>'
@@ -1927,5 +1927,5 @@ function safe(){try{init()}catch(e){}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',safe);else safe();
 })();
 </script>
-<div style="position:fixed;right:8px;bottom:3px;font-size:10px;opacity:.45;pointer-events:none;z-index:1">v 25-Nov 12:55</div></body>
+<div style="position:fixed;right:8px;bottom:3px;font-size:10px;opacity:.45;pointer-events:none;z-index:1">v 25-Nov 14:21</div></body>
 </html>
