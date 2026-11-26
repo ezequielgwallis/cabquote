@@ -57,6 +57,11 @@ body.cust .lp,body.cust .int,body.cust #st-wrap{display:none!important}
 .crow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}.crow .btns{display:flex;gap:6px}.crow button{padding:5px 10px}
 .bad{color:#c0392b;font-weight:700}
 .codebox{font-family:ui-monospace,Menlo,monospace;font-size:18px;font-weight:700;letter-spacing:.06em}
+.authrow[hidden],.pwrow[hidden],.lnk[hidden]{display:none!important}
+.pwrow{display:flex;gap:8px;align-items:stretch}.pwrow input{flex:1;min-width:0}.pwrow button{white-space:nowrap}
+.authrow{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px}
+.authrow .ck{margin:0;display:flex;gap:8px;align-items:center;font-weight:500;border:0;background:none;padding:4px 0;min-height:0;box-shadow:none}.authrow .ck input{width:auto}
+.lnk{background:none!important;border:0!important;box-shadow:none!important;color:#1d4e89;text-decoration:underline;padding:4px 2px!important;min-height:0!important;width:auto!important;font:inherit;font-weight:600;cursor:pointer}
 /* ===== Tema moderno ===== */
 :root{--bg:#f1f2f4;--card:#fff;--ink:#101828;--mut:#5a6577;--line:#dde1e8;--acc:#1d3557;--acc-ink:#fff;--acc-soft:#e8edf5;--brass:#a77c3b;--warn:#9a6b1f;--seg:#e4e7ec;--sh:0 1px 2px rgba(16,24,40,.05),0 8px 24px -12px rgba(16,24,40,.18);--r:14px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c1118;--card:#141b26;--ink:#e9edf3;--mut:#8b97aa;--line:#243044;--acc:#c9a566;--acc-ink:#1a1406;--acc-soft:#2a2418;--brass:#c9a566;--warn:#d9b062;--seg:#1a2230;--sh:0 1px 2px rgba(0,0,0,.35),0 8px 24px -12px rgba(0,0,0,.6)}}
@@ -213,12 +218,22 @@ body.sk-open{overflow:hidden}
 <div class="wrap" id="auth" hidden>
   <h1><span class="logo"><svg class="mk" viewBox="0 0 64 64" width="36" height="36" aria-hidden="true"><rect class="t" width="64" height="64" rx="18"/><path class="c" d="M40.9 22.1A14 14 0 1 0 40.9 41.9"/><rect class="h" x="45" y="25" width="5.5" height="14" rx="2.75"/></svg>CabQuote</span><small>Cotizador de gabinetes</small></h1>
   <div id="authMsg" class="hint" role="status"></div>
-  <div class="sec">
-    <div class="seg"><button id="aIn" class="on" type="button">Entrar</button><button id="aUp" type="button">Crear cuenta</button></div>
+  <div class="sec" id="aMain">
+    <div class="seg" id="aSeg"><button id="aIn" class="on" type="button">Entrar</button><button id="aUp" type="button">Crear cuenta</button></div>
+    <h2 id="aFgT" hidden>Recuperar contraseña</h2>
+    <p class="hint" id="aFgP" hidden>Escribe el email de tu cuenta y te enviamos un enlace para crear una contraseña nueva.</p>
     <div id="aNameW" hidden style="margin-bottom:10px"><label for="aName">Tu nombre</label><input id="aName" autocomplete="name"></div>
-    <div style="margin-bottom:10px"><label for="aEmail">Email</label><input id="aEmail" type="email" inputmode="email" autocomplete="email"></div>
-    <div style="margin-bottom:12px"><label for="aPass">Contraseña</label><input id="aPass" type="password" autocomplete="current-password"></div>
+    <div style="margin-bottom:10px"><label for="aEmail">Email</label><input id="aEmail" type="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false"></div>
+    <div id="aPassW" style="margin-bottom:8px"><label for="aPass">Contraseña</label><div class="pwrow"><input id="aPass" type="password" autocomplete="current-password"><button type="button" id="aEye" aria-pressed="false">Mostrar</button></div></div>
+    <div class="authrow" id="aRemRow"><label class="ck" for="aRem"><input type="checkbox" id="aRem" checked> Recordarme</label><button type="button" class="lnk" id="aForgot">¿Olvidaste tu contraseña?</button></div>
     <div class="actions"><button class="pri" id="aGo" type="button">Entrar</button></div>
+    <div class="authrow" style="margin:12px 0 0"><button type="button" class="lnk" id="aBack" hidden>← Volver a entrar</button><button type="button" class="lnk" id="aResend" hidden>Reenviar correo de confirmación</button></div>
+  </div>
+  <div class="sec" id="aRecSec" hidden>
+    <h2>Crea tu contraseña nueva</h2>
+    <div style="margin-bottom:10px"><label for="aNew">Contraseña nueva</label><div class="pwrow"><input id="aNew" type="password" autocomplete="new-password"><button type="button" id="aEye2" aria-pressed="false">Mostrar</button></div></div>
+    <div style="margin-bottom:12px"><label for="aNew2">Repite la contraseña</label><input id="aNew2" type="password" autocomplete="new-password"></div>
+    <div class="actions"><button class="pri" id="aRecGo" type="button">Guardar contraseña</button></div>
   </div>
   <div class="langrow"><label for="langAuth">Idioma / Language</label><select id="langAuth"><option value="es">Español</option><option value="en">English</option></select></div>
 </div>
@@ -250,7 +265,14 @@ body.sk-open{overflow:hidden}
 
 <div id="v-cust" hidden><div id="cnew"></div><input id="csr" type="search" placeholder="Buscar cliente, teléfono o proyecto" aria-label="Buscar cliente"><div id="cfu"></div><div id="cl"></div></div>
 <div id="v-plat" hidden><div id="pl"></div></div>
-<div id="v-gen" hidden><div class="sec"><h2>Opciones generales</h2><label for="langSel">Idioma</label><select id="langSel"><option value="es">Español</option><option value="en">English</option></select><p class="hint" style="margin:8px 0 0">Elige el idioma en que se muestra la aplicación. Se guarda en este dispositivo.</p></div></div>
+<div id="v-gen" hidden><div class="sec"><h2>Opciones generales</h2><label for="langSel">Idioma</label><select id="langSel"><option value="es">Español</option><option value="en">English</option></select><p class="hint" style="margin:8px 0 0">Elige el idioma en que se muestra la aplicación. Se guarda en este dispositivo.</p></div>
+<div class="sec" id="cpSec"><h2>Cambiar contraseña</h2>
+  <div id="cpMsg" class="hint" role="status"></div>
+  <label for="cpOld">Contraseña actual</label><div class="pwrow"><input id="cpOld" type="password" autocomplete="current-password"><button type="button" id="cpEye" aria-pressed="false">Mostrar</button></div>
+  <label for="cpNew">Contraseña nueva</label><input id="cpNew" type="password" autocomplete="new-password">
+  <label for="cpNew2">Repite la contraseña nueva</label><input id="cpNew2" type="password" autocomplete="new-password">
+  <div class="actions"><button class="pri" id="cpGo" type="button">Cambiar contraseña</button></div>
+  <p class="hint" style="margin:8px 0 0">Mínimo 6 caracteres. Si no recuerdas la actual, sal de la app y usa «¿Olvidaste tu contraseña?» en la pantalla de entrada.</p></div></div>
 
 <div id="v-edit" hidden>
   <h2 id="qt" style="font-size:17px;margin:0 0 10px">Nueva cotización</h2>
@@ -401,10 +423,10 @@ return{a:a,n:n,pr:pr,cost:n*pr,miss:!(pr>0)}}
 /* ---- Despiece real: acomodo de piezas en la placa (MaxRects) ---- */
 function nestPack(units,S,L,gap,mg){/* units:[{a,b,g}] a=dir. de veta; S=lado corto de placa, L=lado largo */
 var UW=S-2*mg+gap,UH=L-2*mg+gap,E=1e-6,bad=[];
-var us=[];units.forEach(function(u){var okG=u.b+gap<=UW+E&&u.a+gap<=UH+E,okR=!u.g&&u.a+gap<=UW+E&&u.b+gap<=UH+E;if(!okG&&!okR){bad.push(u);return}us.push({nm:u.nm,og:u.g,w:u.b+gap,h:u.a+gap,g:u.g,ok:okG,okr:okR,ar:u.a*u.b,mx:Math.max(u.a,u.b),a:u.a,b:u.b})});
+var us=[];units.forEach(function(u){var okG=u.b+gap<=UW+E&&u.a+gap<=UH+E,okR=!u.g&&u.a+gap<=UW+E&&u.b+gap<=UH+E;if(!okG&&!okR){bad.push(u);return}us.push({nm:u.nm,c:u.c,og:u.g,w:u.b+gap,h:u.a+gap,g:u.g,ok:okG,okr:okR,ar:u.a*u.b,mx:Math.max(u.a,u.b),a:u.a,b:u.b})});
 function variant(mode){/* mode: F libre, L lado largo a lo largo de la placa, W lado largo a lo ancho */
  return us.map(function(p){if(p.g||mode==='F')return p;var lo=Math.min(p.a,p.b),hi=Math.max(p.a,p.b),w=(mode==='L'?lo:hi)+gap,h=(mode==='L'?hi:lo)+gap;
-  if(w<=UW+E&&h<=UH+E)return{nm:p.nm,og:false,w:w,h:h,g:true,ok:true,okr:false,ar:p.ar,mx:p.mx,a:p.a,b:p.b};return p})}
+  if(w<=UW+E&&h<=UH+E)return{nm:p.nm,c:p.c,og:false,w:w,h:h,g:true,ok:true,okr:false,ar:p.ar,mx:p.mx,a:p.a,b:p.b};return p})}
 function run(sorter,vs){var list=vs.slice().sort(sorter),bins=[];
  function nb(){var b={free:[{x:0,y:0,w:UW,h:UH}],used:0,rects:[]};bins.push(b);return b}
  function fit(b,p){var best=null;b.free.forEach(function(f){[0,1].forEach(function(r){if(r===0&&!p.ok)return;if(r===1&&(p.g||!p.okr))return;var w=r?p.h:p.w,h=r?p.w:p.h;if(w<=f.w+E&&h<=f.h+E){var sc=Math.min(f.w-w,f.h-h),sc2=Math.max(f.w-w,f.h-h);if(!best||sc<best.sc||(sc===best.sc&&sc2<best.sc2))best={w:w,h:h,sc:sc,sc2:sc2,x:f.x,y:f.y}}})});return best}
@@ -414,7 +436,7 @@ function run(sorter,vs){var list=vs.slice().sort(sorter),bins=[];
   b.free=nf.filter(function(r,i){return !nf.some(function(o,j){if(j===i)return false;var inside=r.x>=o.x-E&&r.y>=o.y-E&&r.x+r.w<=o.x+o.w+E&&r.y+r.h<=o.y+o.h+E;if(!inside)return false;var same=Math.abs(r.w-o.w)<E&&Math.abs(r.h-o.h)<E;return !same||j<i})})}
  list.forEach(function(p){var bb=null,bi=-1;for(var i=0;i<bins.length;i++){var m=fit(bins[i],p);if(m&&(!bb||m.sc<bb.sc)){bb=m;bi=i;if(m.sc<E)break}}
   if(!bb){nb();bi=bins.length-1;bb=fit(bins[bi],p)}
-  put(bins[bi],bb);bins[bi].used+=p.ar;bins[bi].rects.push({nm:p.nm,x:bb.x,y:bb.y,w:bb.w,h:bb.h,g:p.og,a:p.a,b:p.b})});
+  put(bins[bi],bb);bins[bi].used+=p.ar;bins[bi].rects.push({nm:p.nm,c:p.c,x:bb.x,y:bb.y,w:bb.w,h:bb.h,g:p.og,a:p.a,b:p.b})});
  return bins}
 var best=null;['F','L','W'].forEach(function(md){var vs=variant(md);[function(x,y){return y.ar-x.ar},function(x,y){return y.mx-x.mx||y.ar-x.ar},function(x,y){return y.h-x.h||y.w-x.w}].forEach(function(s){var b=run(s,vs);if(!best||b.length<best.length)best=b})});
 best=best||[];var tot=us.reduce(function(s,p){return s+p.ar},0);
@@ -426,12 +448,12 @@ function nestPlan(){var p=aP();if(!cur||cur.mode==='lf')return null;var c=cncOf(
 var dm1=$('o_dmat').value,sec=$('o_dsec').checked&&!!$('o_door').value&&!!dm1,dm2=sec?(CV.c_dmat2||''):'',
  gd1=!!(dm1&&dm1!=='Other'&&CV.c_door&&gr['dm_'+dm1+'|'+CV.c_door]),gd2=!!(dm2&&dm2!=='Other'&&CV.c_door2&&gr['dm_'+dm2+'|'+CV.c_door2]),
  z1=dm1?dmz(p,dm1):{w:48,h:96},z2=dm2?dmz(p,dm2):{w:48,h:96},TK=dm1?tkInfo():null,tkm=TK&&TK.mode==='Match Door'&&TK.tkh>0;
-cur.items.forEach(function(it){var t=by(p.cabs,it.t),w=parseIn(it.w),q=Math.max(1,parseInt(it.q,10)||1);
- parts(it).forEach(function(x){var n=x.q,o=x.t==='1/4'?u14:u34,g=x.t==='1/4'?g14:g34;for(var i=0;i<n;i++)o.push({a:x.a,b:x.b,g:g,nm:x.n})});
- if(dk==='sheet')drawerParts(it).forEach(function(x){for(var i=0;i<x.q;i++)udr.push({a:x.a,b:x.b,g:false,nm:x.nm})});
+cur.items.forEach(function(it,ii){var t=by(p.cabs,it.t),w=parseIn(it.w),q=Math.max(1,parseInt(it.q,10)||1);
+ parts(it).forEach(function(x){var n=x.q,o=x.t==='1/4'?u14:u34,g=x.t==='1/4'?g14:g34;for(var i=0;i<n;i++)o.push({a:x.a,b:x.b,g:g,nm:x.n,c:ii+1})});
+ if(dk==='sheet')drawerParts(it).forEach(function(x){for(var i=0;i<x.q;i++)udr.push({a:x.a,b:x.b,g:false,nm:x.nm,c:ii+1})});
  var nd=t.doors===null?(w>=21?2:1):t.doors;
- if(nd>0&&w>0){var H=dims(it).H,w2=sec&&t.g==='Wall',o=w2?ud2:ud1,g=w2?gd2:gd1;for(var k=0;k<q*nd;k++)o.push({a:H,b:w/nd,g:g,nm:w2?'Puertas Wall':(sec?'Puertas bases':'Puertas')})}
- if(tkm&&(t.g==='Base'||t.g==='Tall')&&w>0)for(var k2=0;k2<q;k2++)ud1.push({a:w,b:TK.tkh,g:gd1,nm:'Toe kick'})});
+ if(nd>0&&w>0){var H=dims(it).H,w2=sec&&t.g==='Wall',o=w2?ud2:ud1,g=w2?gd2:gd1;for(var k=0;k<q*nd;k++)o.push({a:H,b:w/nd,g:g,nm:w2?'Puertas Wall':(sec?'Puertas bases':'Puertas'),c:ii+1})}
+ if(tkm&&(t.g==='Base'||t.g==='Tall')&&w>0)for(var k2=0;k2<q;k2++)ud1.push({a:w,b:TK.tkh,g:gd1,nm:'Toe kick',c:ii+1})});
 var sg=function(u){return u.reduce(function(s,x){return s+x.a*31+x.b},0)};
 var key=JSON.stringify([dk,CV.c_drawer,udr.length,sg(udr),u34.length,u14.length,ud1.length,ud2.length,sg(u34),sg(u14),sg(ud1),sg(ud2),f.w,f.h,g34,g14,gd1,gd2,z1,z2,dm1,dm2,c]);
 if(NESTMEMO.k===key)return NESTMEMO.v;
@@ -443,16 +465,32 @@ var v={bins34:r34.bins||[],bins14:r14.bins||[],S34:Math.min(f.w||48,f.h||96),L34
  bdr:rdr.bins||[],ndr:(!udr.length||rdr.bad.length)?null:rdr.n,udr:rdr.util,dkn:dk==='sheet'?($('o_drawer').value.replace(/ \(standard\)/,'')+(CV.c_drawer?' '+cn('c_drawer'):'')):'',
  bad:r34.bad.concat(r14.bad,rd1.bad,rd2.bad,rdr.bad).map(function(u){return u.nm}),c:c};
 NESTMEMO={k:key,v:v};return v}
-function nestSvg(bins,S,L,c,title,grain){if(!bins||!bins.length)return '';var pal=['#dbeafe','#fde68a','#d1fae5','#fecaca','#e9d5ff','#fed7aa','#cffafe','#fbcfe8'],ix={},ni=0,f1=function(n){return Math.round(n*16)/16},h='<p style="margin:12px 0 4px"><b>'+esc(title)+'</b> · '+bins.length+(bins.length===1?' placa':' placas')+'</p><div style="display:flex;flex-wrap:wrap;gap:8px">';
-bins.forEach(function(rs,bi){var sc=1,svg='<svg viewBox="0 0 '+S+' '+L+'" style="width:46%;min-width:140px;max-width:260px;background:#fff;border:1px solid var(--line);border-radius:4px" role="img" aria-label="Placa '+(bi+1)+'">'
- +'<rect x="'+c.margin+'" y="'+c.margin+'" width="'+(S-2*c.margin)+'" height="'+(L-2*c.margin)+'" fill="none" stroke="#94a3b8" stroke-width=".25" stroke-dasharray="1 1"/>';
+var NMS={'Laterales':'Lateral','Piso':'Piso','Travesaños 4"':'Travesaño','Nailers 4"':'Nailer','Estantes ajustables':'Estante aj.','Estantes fijos':'Estante fijo','Respaldo':'Respaldo','Puertas':'Puerta','Puertas bases':'Puerta','Puertas Wall':'Puerta','Toe kick':'Toe kick','Gav. laterales':'Gav. lateral','Gav. frente':'Gav. frente','Gav. back':'Gav. back','Gav. fondo':'Gav. fondo'};
+function nestLbl(r){var k=r.nm||'',s=NMS[k]||k;return (r.c?'G'+r.c+' ':'')+s}
+function nestFit(t,len,fs){var m=Math.floor(len/(fs*.56));return t.length<=m?t:(m>=5?t.slice(0,m-1)+'…':'')}
+function nestSvg(bins,S,L,c,title,grain){if(!bins||!bins.length)return '';var pal=['#dbeafe','#fde68a','#d1fae5','#fecaca','#e9d5ff','#fed7aa','#cffafe','#fbcfe8'],ix={},ni=0,f1=function(n){return Math.round(n*16)/16},ff=function(n){return String(f1(n))},h='<p style="margin:12px 0 4px"><b>'+esc(title)+'</b> · '+bins.length+(bins.length===1?' placa':' placas')+' de '+ff(S)+'" × '+ff(L)+'"</p><div style="display:flex;flex-wrap:wrap;gap:12px">';
+bins.forEach(function(rs,bi){var svg='<svg viewBox="-8 -7 '+(S+10)+' '+(L+9)+'" style="width:100%;min-width:220px;max-width:400px;flex:1 1 220px;background:#fff;border:1px solid var(--line);border-radius:4px" role="img" aria-label="Placa '+(bi+1)+' de '+ff(S)+' por '+ff(L)+' pulgadas">'
+ +'<rect x="0" y="0" width="'+S+'" height="'+L+'" fill="#fff" stroke="#334155" stroke-width=".35"/>'
+ +'<rect x="'+c.margin+'" y="'+c.margin+'" width="'+(S-2*c.margin)+'" height="'+(L-2*c.margin)+'" fill="none" stroke="#94a3b8" stroke-width=".2" stroke-dasharray="1 1"/>'
+ /* cotas de la placa */
+ +'<g stroke="#475569" stroke-width=".3" fill="#475569"><path d="M0 -2.6H'+S+'M0 -3.6V-1.6M'+S+' -3.6V-1.6" fill="none"/><path d="M0 -2.6l1.6 -.6v1.2zM'+S+' -2.6l-1.6 -.6v1.2z" stroke="none"/>'
+ +'<path d="M-2.6 0V'+L+'M-3.6 0H-1.6M-3.6 '+L+'H-1.6" fill="none"/><path d="M-2.6 0l-.6 1.6h1.2zM-2.6 '+L+'l-.6 -1.6h1.2z" stroke="none"/></g>'
+ +'<text x="'+(S/2)+'" y="-3.8" font-size="2.6" text-anchor="middle" fill="#0f172a" font-weight="600">'+ff(S)+'"</text>'
+ +'<text transform="translate(-3.9 '+(L/2)+') rotate(-90)" font-size="2.6" text-anchor="middle" fill="#0f172a" font-weight="600">'+ff(L)+'"</text>';
  rs.forEach(function(r){var w=r.w-c.gap,hh=r.h-c.gap,x=r.x+c.margin,y=r.y+c.margin,k=r.nm||'';if(ix[k]===undefined)ix[k]=ni++%pal.length;
   svg+='<rect x="'+x+'" y="'+y+'" width="'+w+'" height="'+hh+'" fill="'+pal[ix[k]]+'" stroke="#334155" stroke-width=".2"/>';
-  var fs=Math.min(2.6,w/5.5,hh/3);if(fs>=1.1){var d=(r.g?f1(r.a)+'×'+f1(r.b):f1(Math.max(r.a,r.b))+'×'+f1(Math.min(r.a,r.b)));svg+='<text x="'+(x+w/2)+'" y="'+(y+hh/2+fs/3)+'" font-size="'+fs+'" text-anchor="middle" fill="#0f172a">'+d+'</text>'}
-  if(r.g&&hh>4){var ax=x+w-1.2;svg+='<path d="M'+ax+' '+(y+hh-1)+'V'+(y+1)+'M'+(ax-.6)+' '+(y+1.8)+'L'+ax+' '+(y+1)+'L'+(ax+.6)+' '+(y+1.8)+'" stroke="#475569" stroke-width=".4" fill="none"/>'}});
+  var d=(r.g?ff(r.a)+'×'+ff(r.b):ff(Math.max(r.a,r.b))+'×'+ff(Math.min(r.a,r.b))),nm=nestLbl(r),cx=x+w/2,cy=y+hh/2;
+  var fq=Math.min(2.4,w/4.2,hh/2.7),trunc=nestFit(nm,w-.8,Math.max(fq,.95))!==nm;
+  if((w<5.4&&hh>w*2.2)||(trunc&&hh>w*1.6&&w>=3)){/* pieza angosta: texto girado a lo largo */
+   var tt=nm+' '+d,fs=Math.max(1,Math.min(2.2,w/2.4,(hh-1)/(tt.length*.56))),t=nestFit(tt,hh-1,fs);if(fs>=.9&&t)svg+='<text transform="translate('+(cx+fs/3)+' '+cy+') rotate(-90)" font-size="'+fs+'" text-anchor="middle" fill="#0f172a">'+esc(t)+'</text>'}
+  else{var fs2=Math.min(2.4,w/4.2,hh/2.7);if(fs2>=.95){var t1=nestFit(nm,w-.8,fs2),t2=nestFit(d,w-.8,fs2);
+    if(t1&&t2)svg+='<text x="'+cx+'" y="'+(cy-fs2*.15)+'" font-size="'+fs2+'" text-anchor="middle" fill="#0f172a" font-weight="600">'+esc(t1)+'</text><text x="'+cx+'" y="'+(cy+fs2*1.05)+'" font-size="'+fs2+'" text-anchor="middle" fill="#0f172a">'+esc(t2)+'</text>';
+    else if(t2)svg+='<text x="'+cx+'" y="'+(cy+fs2/3)+'" font-size="'+fs2+'" text-anchor="middle" fill="#0f172a">'+esc(t2)+'</text>'}
+   else{var fs3=Math.min(2.2,hh/1.6);if(fs3>=.95){var t3=nestFit(d,w-.4,fs3);if(t3)svg+='<text x="'+cx+'" y="'+(cy+fs3/3)+'" font-size="'+fs3+'" text-anchor="middle" fill="#0f172a">'+esc(t3)+'</text>'}}}
+  if(r.g&&hh>7&&w>7){var ax=x+w-1.2;svg+='<path d="M'+ax+' '+(y+hh-1)+'V'+(y+1)+'M'+(ax-.6)+' '+(y+1.8)+'L'+ax+' '+(y+1)+'L'+(ax+.6)+' '+(y+1.8)+'" stroke="#475569" stroke-width=".4" fill="none"/>'}});
  h+=svg+'</svg>'});
-var leg=Object.keys(ix).map(function(k){return '<span style="display:inline-block;margin:2px 8px 2px 0"><i style="display:inline-block;width:10px;height:10px;background:'+pal[ix[k]]+';border:1px solid #334155;vertical-align:-1px"></i> '+esc(k)}).join('</span>')+'</span>';
-return h+'</div><p class="hint" style="margin:4px 0 0">'+leg+(grain?'<br>Las flechas muestran el sentido de la veta (Grain).':'')+'</p>'}
+var leg=Object.keys(ix).map(function(k){return '<span style="display:inline-block;margin:2px 8px 2px 0"><i style="display:inline-block;width:10px;height:10px;background:'+pal[ix[k]]+';border:1px solid #334155;vertical-align:-1px"></i> '+esc(NMS[k]||k)}).join('</span>')+'</span>';
+return h+'</div><p class="hint" style="margin:4px 0 0">'+leg+'<br>Cada pieza muestra su nombre, el número de gabinete (G1, G2… como en la lista del despiece) y su medida en pulgadas.'+(grain?'<br>Las flechas muestran el sentido de la veta (Grain).':'')+'</p>'}
 function bkPr(p){if(!(CV.c_bkmat&&CV.c_bkcol))return 0;var v=CV.c_bkcol==='Other'?parseFloat(CV.c_bkp):parseFloat((p.cp||{})['bk_'+CV.c_bkmat+'|'+CV.c_bkcol]);return v>0?v:0}
 function plan(){var p=aP(),r={A:0,B:0,DAi:0,DA2i:0,ia:{},n1:0,n2:0,c34:0,c14:0,d1:null,d2:null,m:0,sh:null,bk:0};
 if(!cur||cur.mode==='lf')return r;
@@ -585,8 +623,8 @@ else h+=ln('Toe kick','elige su color en Opciones para calcular las tiras');
 return h}
 function matCalc(){var el=$('mat');if(!el||!cur)return;if(isD()){var DD=totals().DC||{};el.innerHTML=DD.d1?'<div class="tot"><div class="l"><span>Placas de puerta ('+esc($('o_dmat').value)+(CV.c_door?' '+esc(CV.c_door):'')+')</span><b>'+(DD.n==null?'—':DD.n)+'</b></div><div class="l"><span>Costo de placas</span><b>'+money(DD.d1.cost)+'</b></div>'+(DD.g?'<div class="l"><span>Grain</span><b>Sí: las puertas no se giran</b></div>':'')+'</div>'+(DD.n!=null&&DD.bins&&DD.bins.length?nestSvg(DD.bins,Math.min(DD.z.w||48,DD.z.h||96),Math.max(DD.z.w||48,DD.z.h||96),cncOf(P),'Acomodo en placas: '+$('o_dmat').value+(CV.c_door?' '+CV.c_door:''),DD.g):''):'<p class="hint">Elige el material y el color de la puerta para ver el material.</p>';return}if(cur.mode==='lf'){var tl=tkLines(tkInfo());el.innerHTML='<p class="hint">El material por pieza no está disponible en un estimado por pie lineal (no hay gabinetes individuales).</p>'+tl;return}var p=aP(),f=sheetOf($('fin').value,CV.c_mat),wst=Math.min((p.waste==null?15:p.waste)/100,.5),A=0,B=0,det='',EC=0,ED=0,ED2=0,sec=$('o_dsec').checked&&!!$('o_door').value&&!!$('o_dmat').value,ce=Object.assign({},D.ce,p.ce||{}),mode=$('o_edge').value,dm=mode==='Match Door';
 var DA=0,DA2=0,TK=tkInfo();
-cur.items.forEach(function(it){var L=parts(it);if(!L.length)return;var t=by(p.cabs,it.t),q=dims(it),w2=sec&&t.g==='Wall';var fa=parseIn(it.w)*q.H*Math.max(1,parseInt(it.q,10)||1);if(w2)DA2+=fa;else DA+=fa;
-det+='<p style="margin:10px 0 2px"><b>'+esc(t.name)+'</b> · '+fmtIn(parseIn(it.w))+'" ancho × '+fmtIn(q.H)+'" alto de caja × '+q.D+'" prof. · cant. '+(parseInt(it.q,10)||1)+'</p>';
+cur.items.forEach(function(it,ii){var L=parts(it);if(!L.length)return;var t=by(p.cabs,it.t),q=dims(it),w2=sec&&t.g==='Wall';var fa=parseIn(it.w)*q.H*Math.max(1,parseInt(it.q,10)||1);if(w2)DA2+=fa;else DA+=fa;
+det+='<p style="margin:10px 0 2px"><b>G'+(ii+1)+' · '+esc(t.name)+'</b> · '+fmtIn(parseIn(it.w))+'" ancho × '+fmtIn(q.H)+'" alto de caja × '+q.D+'" prof. · cant. '+(parseInt(it.q,10)||1)+'</p>';
 L.forEach(function(x){var ar=x.q*x.a*x.b,tx='',n=x.e?Math.min(4,Math.max(0,Math.round(ce[x.k]==null?0:ce[x.k]))):0;if(x.t==='1/4')B+=ar;else A+=ar;
 if(n>0){var tot=x.e.slice(0,n).reduce(function(a,b){return a+b},0)*x.q,fr=x.e[0]*x.q;
 if(dm&&x.m==='fixed'){if(w2)ED2+=tot;else ED+=tot}else if(dm&&x.m==='box'){if(w2)ED2+=fr;else ED+=fr;EC+=tot-fr}else EC+=tot;
@@ -841,19 +879,69 @@ function onbMsg(t){$('onbMsg').textContent=t||''}
 async function signOut(){try{await SB.auth.signOut()}catch(e){}location.reload()}
 
 /* ---------- Entrar / crear cuenta ---------- */
-var authMode='in';
-function setAuthMode(m){authMode=m;$('aIn').className=m==='in'?'on':'';$('aUp').className=m==='up'?'on':'';$('aNameW').hidden=m!=='up';$('aGo').textContent=m==='in'?'Entrar':'Crear cuenta';$('aPass').setAttribute('autocomplete',m==='in'?'current-password':'new-password')}
+var authMode='in',RKEY='cq_remember',EKEY='cq_email';
+/* Recordarme: con la casilla marcada la sesión queda en este dispositivo; sin marcar, se borra al cerrar el navegador */
+function remOn(){try{return localStorage.getItem(RKEY)!=='0'}catch(e){return true}}
+var AST={getItem:function(k){try{var a=remOn()?localStorage:sessionStorage,b=remOn()?sessionStorage:localStorage;return a.getItem(k)||b.getItem(k)}catch(e){return null}},
+ setItem:function(k,v){try{var a=remOn()?localStorage:sessionStorage,b=remOn()?sessionStorage:localStorage;a.setItem(k,v);b.removeItem(k)}catch(e){}},
+ removeItem:function(k){try{localStorage.removeItem(k);sessionStorage.removeItem(k)}catch(e){}}};
+function setAuthMode(m){authMode=m;var fg=m==='fg';$('aIn').className=m==='in'?'on':'';$('aUp').className=m==='up'?'on':'';$('aSeg').hidden=fg;$('aFgT').hidden=!fg;$('aFgP').hidden=!fg;$('aPassW').hidden=fg;$('aRemRow').hidden=fg||m==='up';$('aBack').hidden=!fg;$('aResend').hidden=true;
+ $('aNameW').hidden=m!=='up';$('aGo').textContent=fg?'Enviar enlace':m==='in'?'Entrar':'Crear cuenta';$('aPass').setAttribute('autocomplete',m==='in'?'current-password':'new-password');if(!fg)$('aRemRow').hidden=m==='up'}
+function eyeToggle(btn,inputs){btn.onclick=function(){var on=btn.getAttribute('aria-pressed')!=='true';btn.setAttribute('aria-pressed',on?'true':'false');btn.textContent=on?'Ocultar':'Mostrar';inputs.forEach(function(i){$(i).type=on?'text':'password'})}}
+eyeToggle($('aEye'),['aPass']);eyeToggle($('aEye2'),['aNew','aNew2']);
+try{var _e=localStorage.getItem(EKEY);if(_e&&!$('aEmail').value)$('aEmail').value=_e;$('aRem').checked=remOn()}catch(e){}
+$('aForgot').onclick=function(){authMsg('');setAuthMode('fg')};
+$('aBack').onclick=function(){authMsg('');setAuthMode('in')};
+[$('aEmail'),$('aPass')].forEach(function(i){i.addEventListener('keydown',function(e){if(e.key==='Enter'){e.preventDefault();$('aGo').click()}})});
+$('aResend').onclick=async function(){var em=$('aEmail').value.trim();if(!em)return;try{var r=await SB.auth.resend({type:'signup',email:em});authMsg(r.error?r.error.message:'Te reenviamos el correo de confirmación. Revisa también spam.')}catch(e){authMsg('No se pudo conectar. Revisa tu internet.')}};
+/* Contraseña nueva (llega desde el enlace del correo) */
+function showRec(){showOnly('auth');$('aMain').hidden=true;$('aRecSec').hidden=false;authMsg('');try{history.replaceState(null,'',location.pathname)}catch(e){}}
+/* Cambiar contraseña desde Opciones (con la sesión abierta) */
+eyeToggle($('cpEye'),['cpOld','cpNew','cpNew2']);
+function cpMsg(t){$('cpMsg').textContent=t||''}
+$('cpGo').onclick=async function(){
+ var o=$('cpOld').value,a=$('cpNew').value,b=$('cpNew2').value;
+ if(!o){cpMsg('Escribe tu contraseña actual.');return}
+ if(a.length<6){cpMsg('La contraseña nueva debe tener al menos 6 caracteres.');return}
+ if(a!==b){cpMsg('Las contraseñas nuevas no son iguales.');return}
+ if(a===o){cpMsg('La contraseña nueva debe ser distinta a la actual.');return}
+ if(!window.AUTHEM){cpMsg('No se pudo leer tu email. Sal y vuelve a entrar.');return}
+ cpMsg('Un momento...');
+ try{
+  var v=await SB.auth.signInWithPassword({email:window.AUTHEM,password:o});
+  if(v.error){cpMsg('La contraseña actual no es correcta.');return}
+  var r=await SB.auth.updateUser({password:a});
+  if(r.error){cpMsg(r.error.message);return}
+  $('cpOld').value='';$('cpNew').value='';$('cpNew2').value='';cpMsg('✔ Contraseña cambiada.')}
+ catch(e){cpMsg('No se pudo conectar. Revisa tu internet.')}};
+$('aRecGo').onclick=async function(){
+ var a=$('aNew').value,b=$('aNew2').value;
+ if(a.length<6){authMsg('La contraseña debe tener al menos 6 caracteres.');return}
+ if(a!==b){authMsg('Las contraseñas no son iguales.');return}
+ authMsg('Un momento...');
+ try{var r=await SB.auth.updateUser({password:a});
+  if(r.error){authMsg(r.error.message);return}
+  $('aRecSec').hidden=true;$('aMain').hidden=false;authMsg('');await afterLogin()}
+ catch(e){authMsg('No se pudo conectar. Revisa tu internet.')}};
 $('aIn').onclick=function(){setAuthMode('in')};
 $('aUp').onclick=function(){setAuthMode('up')};
 $('aGo').onclick=async function(){
  var em=$('aEmail').value.trim(),pw=$('aPass').value;
+ if(authMode==='fg'){
+  if(!em){authMsg('Escribe tu email.');return}
+  authMsg('Un momento...');
+  try{var rf=await SB.auth.resetPasswordForEmail(em,{redirectTo:location.origin+location.pathname});
+   authMsg(rf.error?(/rate|seconds|too many/i.test(rf.error.message||'')?'Espera un minuto antes de pedir otro enlace.':rf.error.message):'Si ese email tiene cuenta, te enviamos un enlace para crear una contraseña nueva. Revisa también spam.')}
+  catch(e){authMsg('No se pudo conectar. Revisa tu internet.')}
+  return}
  if(!em||!pw){authMsg('Escribe tu email y contraseña.');return}
+ try{var rm=$('aRem').checked||authMode==='up';localStorage.setItem(RKEY,rm?'1':'0');if(rm&&authMode==='in')localStorage.setItem(EKEY,em);else if(!rm)localStorage.removeItem(EKEY)}catch(e){}
  if(authMode==='up'&&pw.length<6){authMsg('La contraseña debe tener al menos 6 caracteres.');return}
  authMsg('Un momento...');
  try{
   var r=authMode==='in'?await SB.auth.signInWithPassword({email:em,password:pw}):await SB.auth.signUp({email:em,password:pw,options:{data:{full_name:$('aName').value.trim()}}});
   if(r.error){authMsg(r.error.message==='Invalid login credentials'?'Email o contraseña incorrectos.':r.error.message);return}
-  if(!r.data.session){authMsg('Revisa tu correo para confirmar la cuenta y luego entra.');return}
+  if(!r.data.session){authMsg('Revisa tu correo para confirmar la cuenta y luego entra.');$('aResend').hidden=false;return}
   if(authMode==='up'&&$('aName').value.trim())$('oName').value=$('aName').value.trim();
   authMsg('');await afterLogin();
  }catch(e){authMsg('No se pudo conectar. Revisa tu internet.')}
@@ -1457,9 +1545,13 @@ async function start(info){
  var oc=new URLSearchParams(location.search).get('owner');
  if(oc){$('oCode').value=oc;OWNERHINT=true;setAuthMode('up')}
  if(!window.supabase){showOnly('auth');authMsg('No se pudo cargar la conexión. Revisa tu internet y recarga la página.');return}
- SB=window.supabase.createClient(CFG.url,CFG.key);
+ SB=window.supabase.createClient(CFG.url,CFG.key,{auth:{storage:AST,persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+ var HX=location.hash+'&'+location.search,REC=/type=recovery/.test(HX),HERR=/error_code=|error=access_denied/.test(HX);
+ try{SB.auth.onAuthStateChange(function(ev){if(ev==='PASSWORD_RECOVERY')showRec()})}catch(e){}
  try{
   var s=await SB.auth.getSession();
+  if(HERR){showOnly('auth');try{history.replaceState(null,'',location.pathname)}catch(e){}authMsg('El enlace venció o ya se usó. Pide uno nuevo con «¿Olvidaste tu contraseña?».');return}
+  if(REC&&s.data.session){showRec();return}
   if(!s.data.session){showOnly('auth');return}
   await afterLogin();
  }catch(e){showOnly('auth');authMsg('No se pudo conectar. Revisa tu internet.')}
@@ -1679,6 +1771,7 @@ window.makePdf=async function(d){
  function np(){pg=[];pages.push(pg);y=M}
  function fmt(g){return (g/255).toFixed(3)}
  function T(x,yy,s,sz,b,al,gray){var w=tw(s,sz,b);if(al==='r')x-=w;else if(al==='c')x-=w/2;pg.push('BT /'+(b?'F2':'F1')+' '+sz+' Tf '+fmt(gray||17)+' g '+x.toFixed(2)+' '+(H-yy).toFixed(2)+' Td ('+enc(s)+') Tj ET')}
+ function TR(xb,yc,s,sz,b,gray){var w=tw(s,sz,b);pg.push('BT /'+(b?'F2':'F1')+' '+sz+' Tf '+fmt(gray||17)+' g 0 1 -1 0 '+xb.toFixed(2)+' '+(H-yc-w/2).toFixed(2)+' Tm ('+enc(s)+') Tj ET')}
  function Ln(x1,y1,x2,y2,wd,gray){pg.push(fmt(gray==null?200:gray)+' G '+wd+' w '+x1.toFixed(2)+' '+(H-y1).toFixed(2)+' m '+x2.toFixed(2)+' '+(H-y2).toFixed(2)+' l S')}
  function need(h){if(y+h>H-M-14)np()}
  function H3(s){need(40);y+=14;T(M,y,s,11,true);y+=4;Ln(M,y,W-M,y,.8,120);y+=4}
@@ -1729,16 +1822,23 @@ window.makePdf=async function(d){
   function Rc(x,yy,w,h,fl,st,lw){pg.push((fl?fl.map(function(v){return (v/255).toFixed(3)}).join(' ')+' rg ':'')+(st?'0.2 0.25 0.33 RG '+(lw||.4)+' w ':'')+x.toFixed(2)+' '+(H-yy-h).toFixed(2)+' '+w.toFixed(2)+' '+h.toFixed(2)+' re '+(fl&&st?'B':fl?'f':'S'))}
   H3('Acomodo en placas (corte CNC)');
   [[N.n34!=null?N.bins34:null,N.S34,N.L34,'Placas '+d.nest.fname,N.g34],[N.n14!=null?N.bins14:null,48,96,'Respaldo 1/4',N.g14],[N.nd1!=null?N.bd1:null,N.Sd1,N.Ld1,'Puertas '+d.nest.dn1,N.gd1],[N.nd2!=null?N.bd2:null,N.Sd2,N.Ld2,'Puertas Wall '+d.nest.dn2,N.gd2],[N.ndr!=null?N.bdr:null,48,96,'Cajas de gaveta '+N.dkn,false]].forEach(function(G){var bins=G[0];if(!bins||!bins.length)return;
-   need(40);T(M,y+10,G[3]+' · '+bins.length+(bins.length===1?' placa':' placas')+(G[4]?' · con Grain (las flechas marcan la veta)':''),9.5,true);y+=16;
-   var gp=8,sw=(CW-3*gp)/4,sc=sw/G[1],sh=G[2]*sc,ix={},ni=0,col=0,ry=y;
-   bins.forEach(function(rs,bi){if(col===0){if(y+sh+14>H-M-14){np()}ry=y}
-    var x0=M+col*(sw+gp);T(x0,ry+8,'Placa '+(bi+1),7.5,true,null,70);var oy=ry+11;
-    Rc(x0,oy,sw,sh,[255,255,255],true,.6);
-    rs.forEach(function(r){var w=(r.w-N.c.gap)*sc,hh=(r.h-N.c.gap)*sc,x=x0+(r.x+N.c.margin)*sc,yy=oy+(r.y+N.c.margin)*sc,k=r.nm||'';if(ix[k]===undefined)ix[k]=ni++%PAL.length;
+   need(G[2]*(((CW-20)/3-18)/G[1])+66);T(M,y+10,G[3]+' · '+bins.length+(bins.length===1?' placa':' placas')+(G[4]?' · con Grain (las flechas marcan la veta)':''),9.5,true);y+=16;
+   var gp=10,lm=18,c3=(CW-2*gp)/3,sw=c3-lm,sc=sw/G[1],sh=G[2]*sc,ix={},ni=0,col=0,ry=y,ff=function(n){return String(Math.round(n*16)/16)};
+   function fitT(s,sz,b,len){if(tw(s,sz,b)<=len)return s;var t=s;while(t.length>3&&tw(t+'.',sz,b)>len)t=t.slice(0,-1);return t.length>3?t+'.':''}
+   bins.forEach(function(rs,bi){if(col===0){if(y+sh+36>H-M-14){np()}ry=y}
+    var x0=M+col*(c3+gp),sx=x0+lm,oy=ry+25;T(x0,ry+8,'Placa '+(bi+1)+' de '+ff(G[1])+'" x '+ff(G[2])+'"',7.5,true,null,70);
+    T(sx+sw/2,ry+18,ff(G[1])+'"',7,true,'c');Ln(sx,ry+21,sx+sw,ry+21,.5,90);Ln(sx,ry+18.5,sx,ry+23.5,.5,90);Ln(sx+sw,ry+18.5,sx+sw,ry+23.5,.5,90);
+    Ln(x0+12,oy,x0+12,oy+sh,.5,90);Ln(x0+9.5,oy,x0+14.5,oy,.5,90);Ln(x0+9.5,oy+sh,x0+14.5,oy+sh,.5,90);TR(x0+8.5,oy+sh/2,ff(G[2])+'"',7,true);
+    Rc(sx,oy,sw,sh,[255,255,255],true,.6);
+    rs.forEach(function(r){var w=(r.w-N.c.gap)*sc,hh=(r.h-N.c.gap)*sc,x=sx+(r.x+N.c.margin)*sc,yy=oy+(r.y+N.c.margin)*sc,k=r.nm||'';if(ix[k]===undefined)ix[k]=ni++%PAL.length;
      Rc(x,yy,w,hh,PAL[ix[k]],true,.3);
-     if(w>34&&hh>9){var f1=function(n){return (Math.round(n*16)/16).toString()},ds=r.g?f1(r.a)+'x'+f1(r.b):f1(Math.max(r.a,r.b))+'x'+f1(Math.min(r.a,r.b));T(x+w/2,yy+hh/2+2,ds,5.5,false,'c')}
-     if(r.g&&hh>14){var ax=x+w-4;pg.push('0.28 G .5 w '+ax.toFixed(2)+' '+(H-yy-hh+3).toFixed(2)+' m '+ax.toFixed(2)+' '+(H-yy-3).toFixed(2)+' l S '+(ax-2).toFixed(2)+' '+(H-yy-6).toFixed(2)+' m '+ax.toFixed(2)+' '+(H-yy-3).toFixed(2)+' l '+(ax+2).toFixed(2)+' '+(H-yy-6).toFixed(2)+' l S')}});
-    if(col===3||bi===bins.length-1){y=ry+11+sh+10;col=0}else col++});
+     var ds=r.g?ff(r.a)+'x'+ff(r.b):ff(Math.max(r.a,r.b))+'x'+ff(Math.min(r.a,r.b)),nm=nestLbl(r),cx=x+w/2,cy=yy+hh/2;
+     if((w<16&&hh>w*2.2)||(w<=70&&w>8&&hh>w*1.5&&tw(nm,6,true)>w-4)){var sz=Math.max(4.2,Math.min(6,w/2.6)),s=fitT(nm+' '+ds,sz,false,hh-4);if(s)TR(cx+sz*.35,cy,s,sz,false)}
+     else if(w>26&&hh>16){var t1=fitT(nm,6,true,w-4),t2=fitT(ds,5.5,false,w-4);if(t1)T(cx,cy-1,t1,6,true,'c');if(t2)T(cx,cy+(t1?6.5:2),t2,5.5,false,'c')}
+     else if(w>44&&hh>6){var t4=fitT(nm+' '+ds,5,false,w-3);if(t4)T(cx,cy+1.8,t4,5,false,'c')}
+     else if(w>30&&hh>9){var t3=fitT(ds,5.5,false,w-3);if(t3)T(cx,cy+2,t3,5.5,false,'c')}
+     if(r.g&&hh>14&&w>14){var ax=x+w-4;pg.push('0.28 G .5 w '+ax.toFixed(2)+' '+(H-yy-hh+3).toFixed(2)+' m '+ax.toFixed(2)+' '+(H-yy-3).toFixed(2)+' l S '+(ax-2).toFixed(2)+' '+(H-yy-6).toFixed(2)+' m '+ax.toFixed(2)+' '+(H-yy-3).toFixed(2)+' l '+(ax+2).toFixed(2)+' '+(H-yy-6).toFixed(2)+' l S')}});
+    if(col===2||bi===bins.length-1){y=ry+25+sh+10;col=0}else col++});
    var lx=M;Object.keys(ix).forEach(function(k){need(14);var wl=tw(k,7.5,false)+22;if(lx+wl>W-M){lx=M;y+=11}Rc(lx,y+1,8,8,PAL[ix[k]],true,.3);T(lx+11,y+8,k,7.5,false);lx+=wl});y+=16});
  }
  // pie de página
@@ -1958,5 +2058,5 @@ function safe(){try{init()}catch(e){}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',safe);else safe();
 })();
 </script>
-<div style="position:fixed;right:8px;bottom:3px;font-size:10px;opacity:.45;pointer-events:none;z-index:1">v 25-Nov 19:22</div></body>
+<div style="position:fixed;right:8px;bottom:3px;font-size:10px;opacity:.45;pointer-events:none;z-index:1">v 25-Nov 19:38</div></body>
 </html>
