@@ -1803,10 +1803,12 @@ async function custGo(ch){
  var lk1=custLocked(),id=lk1?cur.id:await save();if(!id){if(w0)try{w0.close()}catch(x){}return}
  /* el PDF (con el despiece) se sube ANTES de enviar al taller: después ya no se permite subir archivos. Se reutiliza el mismo enlace en los reenvíos. */
  if(!cur._plink||!lk1){try{cur._plink=await pdfLink()}catch(x){cur._plink=''}}
+ var nolk=!cur._plink;
  if(!lk1&&(cur.status==='tentative'||!cur.status||cur.status==='draft')){var r=await SB.rpc('submit_quote',{p_quote:id});if(r.error&&!/no encontrada/i.test(r.error.message||'')){msg(r.error.message);return}cur._sub=true}
  var m=sendMsg(),nn=cur.num,pj=cur.project||$$('pn').value;
  if(cur._plink)m.text+='\n\n'+(en()?'Download the PDF (link valid for 30 days): ':'Descargar el PDF de la cotización (el enlace vale 30 días): ')+cur._plink;
  try{await loadQuotes()}catch(e){}
+ if(nolk){pdfFile().then(function(f){download(f);setTimeout(function(){msg('No se pudo crear el enlace: se descargó el PDF. Adjúntalo al correo.')},600)},function(){})}
  if(typeof show==='function')show('list');
  if(window.sentBanner)sentBanner(nn,pj,ch==='mail'?'tu correo':'WhatsApp');
  if(ch==='mail'){mailGo(sc.email,m.subject,m.text,w0)}
@@ -1936,5 +1938,5 @@ function safe(){try{init()}catch(e){}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',safe);else safe();
 })();
 </script>
-<div style="position:fixed;right:8px;bottom:3px;font-size:10px;opacity:.45;pointer-events:none;z-index:1">v 25-Nov 17:17</div></body>
+<div style="position:fixed;right:8px;bottom:3px;font-size:10px;opacity:.45;pointer-events:none;z-index:1">v 25-Nov 17:23</div></body>
 </html>
