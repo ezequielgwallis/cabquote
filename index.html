@@ -1651,9 +1651,8 @@ load=function(q){_loadCli(q);var h=!!regCust(q);['cp','ca','ce'].forEach(functio
  function base(){return location.origin+location.pathname}
  function inviteText(role,name,shop,link,code){
   var E=en(),hi=name?(E?'Hi '+name+',':'Hola '+name+','):(E?'Hi,':'Hola,');
-  var why=role==='c'?(E?'to quote your projects':'para cotizar tus proyectos'):role==='s'?(E?'to work on the shop quotes':'para trabajar en las cotizaciones del taller'):(E?'to manage the shop with me':'para administrar el taller conmigo');
-  var t=E?hi+'\n'+shop+' invites you to use CabQuote '+why+'.\n\n1. Open: '+link+'\n2. Create your account (or sign in).\n3. If it asks for an access code, enter: '+code
-        :hi+'\n'+shop+' te invita a usar CabQuote '+why+'.\n\n1. Abre: '+link+'\n2. Crea tu cuenta (o inicia sesión).\n3. Si te pide un código de acceso, escribe: '+code;
+  var t=E?hi+'\nWe invite you to use CabQuote, to quote your carpentry projects in minutes.\n\n1. Open: '+link+'\n2. Create your account.\n3. If it asks for an access code, enter: '+code
+        :hi+'\nTe invitamos a utilizar CabQuote, para cotizar tus proyectos de carpintería en minutos.\n\n1. Abre: '+link+'\n2. Crea tu cuenta.\n3. Si te pide un código de acceso, escribe: '+code;
   if(role==='n')t+=E?'\n\nThis owner code works only once.':'\n\nEste código de dueño se puede usar una sola vez.';
   return t}
  function digits(p){var d=(p||'').replace(/\D/g,'');if(d.length===10)d='1'+d;return d}
@@ -2186,5 +2185,5 @@ function safe(){try{init()}catch(e){}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',safe);else safe();
 })();
 </script>
-<div style="position:fixed;right:10px;bottom:calc(84px + env(safe-area-inset-bottom,0px));font-size:11px;opacity:.6;pointer-events:none;z-index:5">v 27-Nov 21:29</div></body>
+<div style="position:fixed;right:10px;bottom:calc(84px + env(safe-area-inset-bottom,0px));font-size:11px;opacity:.6;pointer-events:none;z-index:5">v 27-Nov 21:37</div></body>
 </html>
