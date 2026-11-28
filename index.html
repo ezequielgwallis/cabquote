@@ -733,8 +733,9 @@ var T=totals();if(!$('cn').value.trim()){msg('Escribe el nombre del cliente.');r
 var NPs=nestPlan(),now=Date.now(),d={client:{name:$('cn').value.trim(),phone:$('cp').value,email:$('ce').value,addr:$('ca').value},delivery:$('dd').value,pa:$('pa').value.trim(),mode:cur.mode||'cab',lf:cur.lf||{},project:$('pn').value.trim(),opts:Object.assign(collectOpts(),NPs?{ns34:NPs.n34,ns14:NPs.n14,nsd1:NPs.nd1,nsd2:NPs.nd2}:{},isD()?{_doors:cur.doors,nsd1:doorN()}:{}),status:$('st').value,fin:$('fin').value,hw:$('hw').value,margin:parseFloat($('mar').value)||0,tax:parseFloat($('tax').value)||0,items:cur.items,doors:cur.doors||[],snap:cur.snap||cl(P),cost:T.cost,subtotal:T.sub,taxAmt:T.tax,total:T.tot,num:cur.num||nextNum(),createdAt:cur.createdAt||now,updatedAt:now};
 var p=persist(d);
 return p.then(function(id){cur=Object.assign({id:id},d);$('qt').textContent='Cotización #'+d.num;$('del').hidden=ROLE==='customer';$('snapn').hidden=ROLE==='customer'||!d.snap;msg('Cotización guardada');loadQuotes();return id}).catch(function(e){msg(ROLE==='customer'&&e&&e.message?e.message:'No se pudo guardar. Revisa tu acceso.')})}
-function drawList(){var f=$('q').value.toLowerCase();var a=qs.filter(function(q){return (q.client&&q.client.name||'').toLowerCase().indexOf(f)>-1});
-$('ql').innerHTML=a.length?a.map(function(q){return '<button class="item" data-o="'+q.id+'"><span><b>'+esc(q.client.name)+'</b><small>'+esc(q.project||'')+(q.project?' · ':'')+'#'+q.num+(q.mode==='doors'?' · Puertas':'')+' · '+ST[q.status]+' · '+new Date(q.updatedAt).toLocaleDateString('es-US')+'</small></span><span class="r pv">'+money(q.total)+'</span></button>'}).join(''):'<p class="hint">'+(db?'Todavía no hay cotizaciones. Toca Nueva para crear la primera.':'Cargando...')+'</p>'}
+function qName(q){return q.client&&q.client.name||''}
+function drawList(){var f=$('q').value.toLowerCase();var a=qs.filter(function(q){return qName(q).toLowerCase().indexOf(f)>-1});
+$('ql').innerHTML=a.length?a.map(function(q){return '<button class="item" data-o="'+q.id+'"><span><b>'+esc(qName(q))+'</b><small>'+esc(q.project||'')+(q.project?' · ':'')+'#'+q.num+(q.mode==='doors'?' · Puertas':'')+' · '+ST[q.status]+' · '+new Date(q.updatedAt).toLocaleDateString('es-US')+'</small></span><span class="r pv">'+money(q.total)+'</span></button>'}).join(''):'<p class="hint">'+(db?'Todavía no hay cotizaciones. Toca Nueva para crear la primera.':'Cargando...')+'</p>'}
 function drawCust(){var m={};qs.forEach(function(q){var n=q.client.name;(m[n]=m[n]||{c:q.client,n:0,t:0}).n++;m[n].t+=q.total});var k=Object.keys(m).sort();
 $('cdl').innerHTML=k.map(function(n){return '<option value="'+esc(n)+'">'}).join('');
 $('cl').innerHTML=k.length?k.map(function(n){return '<button class="item" data-c="'+esc(n)+'"><span><b>'+esc(n)+'</b><small>'+esc(m[n].c.phone||m[n].c.email||'')+' · '+m[n].n+' cotizaciones</small></span><span class="r">'+money(m[n].t)+'</span></button>'}).join(''):'<p class="hint">Los clientes aparecen al guardar su primera cotización.</p>'}
@@ -1288,11 +1289,11 @@ function fdate(s){if(!s)return '';var m=/^(\d{4})-(\d\d)-(\d\d)/.exec(s);return 
 function optsH(arr,v){return arr.map(function(o){return '<option value="'+o[0]+'"'+(o[0]===(v||'')?' selected':'')+'>'+o[1]+'</option>'}).join('')}
 var NOCLI='Sin cliente';
 function custQuotes(n){var c=CUS.filter(function(x){return x.name===n})[0];
- return qs.filter(function(q){return (c&&q.customerId&&q.customerId===c.id)||q.client.name===n||(n===NOCLI&&!(q.client&&q.client.name)&&!q.customerId)})}
+ return qs.filter(function(q){return c&&q.customerId&&q.customerId===c.id})}
 function lastAct(list){var m=0;list.forEach(function(q){if(q.updatedAt>m)m=q.updatedAt});return m}
 function allClients(){
  var seen={},arr=[];
- CUS.forEach(function(c){if(c.name&&!seen[c.name]){seen[c.name]=1;arr.push({n:c.name,id:c.id,p:c.phone||'',e:c.email||'',a:c.address||'',app:!!c.profile_id})}});
+ CUS.forEach(function(c){if(c.profile_id&&c.name&&!seen[c.name]){seen[c.name]=1;arr.push({n:c.name,id:c.id,p:c.phone||'',e:c.email||'',a:c.address||'',app:!!c.profile_id})}});
  /* Los clientes que solo aparecen escritos dentro de las cotizaciones de un cliente registrado son clientes de ese cliente: no se listan. */
  arr.sort(function(a,b){return a.n.localeCompare(b.n)});
  return arr;
@@ -1304,7 +1305,7 @@ function drawNew(){
  try{var tb=document.querySelector('.tabs button[data-v="cust"]');
  if(tb){var b=tb.querySelector('.bdg');if(a.length){if(!b){b=document.createElement('span');b.className='bdg';tb.appendChild(b)}b.textContent=a.length}else if(b)b.remove()}}catch(e){}
  var warn=ROLE==='shop_admin'&&!validEmail(P.cem)&&!CDET?'<div class="sec" id="needem"><h2>Falta el email del taller</h2><p class="hint">Es obligatorio: tus clientes lo usan para enviarte sus cotizaciones. Ve a <b>Mi taller → Contacto del taller</b>.</p></div>':'';
- el.innerHTML=warn+(a.length&&!CDET?'<div class="sec"><h2>Solicitudes nuevas de clientes ('+a.length+')</h2>'+a.map(function(q){return '<button class="item" data-o="'+q.id+'" type="button"><span><b>'+esc(q.client.name||'Cliente')+'</b><small>'+esc(q.project||'Sin nombre')+' · #'+q.num+' · '+new Date(q.updatedAt).toLocaleDateString(window.I18N&&I18N.get&&I18N.get()==='en'?'en-US':'es-US')+'</small></span><span class="r">Abrir</span></button>'}).join('')+'<p class="hint">Cuando la abras y cambies su estado, sale de esta lista.</p></div>':'')}
+ el.innerHTML=warn+(a.length&&!CDET?'<div class="sec"><h2>Solicitudes nuevas de clientes ('+a.length+')</h2>'+a.map(function(q){return '<button class="item" data-o="'+q.id+'" type="button"><span><b>'+esc(qName(q)||'Cliente')+'</b><small>'+esc(q.project||'Sin nombre')+' · #'+q.num+' · '+new Date(q.updatedAt).toLocaleDateString(window.I18N&&I18N.get&&I18N.get()==='en'?'en-US':'es-US')+'</small></span><span class="r">Abrir</span></button>'}).join('')+'<p class="hint">Cuando la abras y cambies su estado, sale de esta lista.</p></div>':'')}
 drawCust=function(){
  drawNew();
  var arr=allClients();
@@ -1317,9 +1318,7 @@ drawCust=function(){
  var fu=arr.filter(function(c){var i=c.id&&INFO[c.id];return i&&i.follow_date&&i.follow_date<=li}).sort(function(a,b){return INFO[a.id].follow_date<INFO[b.id].follow_date?-1:1});
  $('cfu').innerHTML=fu.length?'<div class="sec"><h2>Seguimientos</h2>'+fu.map(function(c){var i=INFO[c.id],late=i.follow_date<td,now=i.follow_date===td;
   return '<button class="item" data-c="'+esc(c.n)+'" type="button"><span><b>'+esc(c.n)+'</b><small>'+esc(i.follow_note||'')+'</small></span><span class="r'+(late?' bad':'')+'">'+(late?'Vencido · ':now?'Hoy · ':'')+fdate(i.follow_date)+'</span></button>'}).join('')+'</div>':'';
- var nreg=arr.filter(function(c){return c.app}).length;
- var ft=$('cflt');if(ft){ft.hidden=!!CDET;ft.innerHTML=[['all','Todos',arr.length],['app','Registrados en la app',nreg],['noapp','Sin cuenta',arr.length-nreg]].map(function(f){return '<button type="button" data-f="'+f[0]+'" class="'+(CFLT===f[0]?'on':'')+'">'+f[1]+' <span class="n">'+f[2]+'</span></button>'}).join('')}
- if(CFLT==='app')arr=arr.filter(function(c){return c.app});else if(CFLT==='noapp')arr=arr.filter(function(c){return !c.app});
+ var ft=$('cflt');if(ft){ft.hidden=true;ft.innerHTML=''}
  var s=csearch(),sh=arr;
  if(s)sh=arr.filter(function(c){var q=custQuotes(c.n).map(function(x){return x.project||''}).join(' ');return (c.n+' '+c.p+' '+c.e+' '+c.a+' '+q).toLowerCase().indexOf(s)>-1});
  $('cl').innerHTML=sh.length?sh.map(function(c){var n=custQuotes(c.n).length,t=c.id&&INFO[c.id]&&INFO[c.id].ctype;return '<button class="item" data-c="'+esc(c.n)+'" type="button"><span><b>'+esc(c.n)+'</b><small>'+esc(c.p||c.e)+'</small></span><span class="r hint">'+(c.app?'Cuenta en la app':'')+(n?(c.app?' · ':'')+'#'+n:'')+'</span></button>'}).join(''):'<p class="hint">'+(s?'Ningún cliente coincide.':'Aquí aparecen tus clientes.')+'</p>';
@@ -1628,6 +1627,12 @@ function init(){var sel=document.getElementById('themeSel');if(!sel)return;sel.v
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init()})();
 
 $('cflt').addEventListener('click',function(e){var t=e.target.closest('button[data-f]');if(!t)return;CFLT=t.dataset.f;drawCust()});
+
+/* Solo se muestran los clientes con cuenta. Los clientes finales que un cliente escribe en sus cotizaciones son información de ese cliente. */
+function regCust(q){if(ROLE==='customer'||!q||!q.customerId)return null;var c=CUS.filter(function(x){return x.id===q.customerId})[0];return c&&c.profile_id?c:null}
+qName=function(q){var c=regCust(q);return c?c.name:(q.client&&q.client.name||'')};
+var _loadCli=load;
+load=function(q){_loadCli(q);var h=!!regCust(q);['cp','ca','ce'].forEach(function(id){var e=$(id);if(e&&e.parentNode)e.parentNode.hidden=h})};
 
 </script>
 <script>/* ---------- Dibujos (dedo o lápiz) ---------- */
@@ -2132,5 +2137,5 @@ function safe(){try{init()}catch(e){}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',safe);else safe();
 })();
 </script>
-<div style="position:fixed;right:8px;bottom:3px;font-size:10px;opacity:.45;pointer-events:none;z-index:1">v 27-Nov 20:56</div></body>
+<div style="position:fixed;right:8px;bottom:3px;font-size:10px;opacity:.45;pointer-events:none;z-index:1">v 27-Nov 21:01</div></body>
 </html>
