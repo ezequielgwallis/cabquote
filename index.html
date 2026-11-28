@@ -1679,7 +1679,10 @@ load=function(q){_loadCli(q);var h=!!regCust(q);['cp','ca','ce'].forEach(functio
   if(t.id==='invWa'){var ph=digits(document.getElementById('invPh').value);window.open('https://wa.me/'+(ph||'')+'?text='+encodeURIComponent(txt),'_blank','noopener');return}
   if(t.id==='invMail'){var em=document.getElementById('invEm').value.trim();var sj=en()?'Invitation to CabQuote':'Invitación a CabQuote';mailGo(em,sj,txt,null)}
  });
- document.addEventListener('DOMContentLoaded',function(){});
+ function reset(){['invName','invPh','invEm'].forEach(function(i){var x=document.getElementById(i);if(x)x.value=''});var m=document.getElementById('invMsg');if(m)m.value='';var o=document.getElementById('invOut');if(o)o.hidden=true;note('')}
+ function stale(e){if(e.target&&/^(invRole|invName|invPh|invEm)$/.test(e.target.id)){var o=document.getElementById('invOut');if(o&&!o.hidden){o.hidden=true;note('')}}}
+ document.addEventListener('input',stale);document.addEventListener('change',stale);
+ document.addEventListener('click',function(e){var t=e.target.closest&&e.target.closest('#invWa,#invMail,#invCp');if(t)setTimeout(reset,1200)});
 })();
 
 </script>
@@ -2185,5 +2188,5 @@ function safe(){try{init()}catch(e){}}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',safe);else safe();
 })();
 </script>
-<div style="position:fixed;right:10px;bottom:calc(84px + env(safe-area-inset-bottom,0px));font-size:11px;opacity:.6;pointer-events:none;z-index:5">v 27-Nov 21:44</div></body>
+<div style="position:fixed;right:10px;bottom:calc(84px + env(safe-area-inset-bottom,0px));font-size:11px;opacity:.6;pointer-events:none;z-index:5">v 27-Nov 21:51</div></body>
 </html>
